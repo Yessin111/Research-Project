@@ -1,12 +1,13 @@
 import csv
 import json
 import urllib.request
-import requests
 import threading
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from unidecode import unidecode
 
 values = []
 count = 0
@@ -32,12 +33,12 @@ def openlibrary_info(isbn, lock):
     try:
         with urllib.request.urlopen("https://openlibrary.org/isbn/" + isbn + ".json") as url_book:
             data_book = json.load(url_book)
-            title_ol = data_book["title"].strip()
+            title_ol = unidecode(data_book["title"].split("(")[0].split("[")[0].split("\r\n")[0].strip())
 
             if "authors" in data_book:
                 with urllib.request.urlopen("https://openlibrary.org" + data_book["authors"][0]["key"] + ".json") as url_author:
                     data_author = json.load(url_author)
-                    author_ol = data_author["name"].strip()
+                    author_ol = unidecode(data_author["name"].strip())
             else:
                 author_ol = "AUTHOR_MISSING_OL"
 
@@ -61,8 +62,6 @@ def openlibrary_info(isbn, lock):
                         "grade": az_info[3],
                     }
                     values.append(new_value)
-
-
     except:
         with lock:
             count = count + 1
@@ -77,10 +76,10 @@ def amazon_info(isbn):
     browser = webdriver.Chrome(service=s, options=options)
     url_search = "https://www.amazon.com/s?k="+isbn
     browser.get(url_search)
-    url_book = browser.find_element(By.CLASS_NAME, "s-search-results").find_element(By.CSS_SELECTOR,"[data-index=\"1\"]").find_element(By.CSS_SELECTOR, "[href]").get_property("href")
+    url_book = browser.find_element(By.CLASS_NAME, "s-search-results").find_element(By.CSS_SELECTOR, "[data-index=\"1\"]").find_element(By.CSS_SELECTOR, "[href]").get_property("href")
     browser.get(url_book)
     try:
-        language = browser.find_element(By.ID, "rpi-attribute-language").find_element(By.CLASS_NAME,"rpi-attribute-value").get_attribute("textContent").strip()
+        language = unidecode(browser.find_element(By.ID, "rpi-attribute-language").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
     except:
         language = "English"
 
@@ -88,21 +87,21 @@ def amazon_info(isbn):
         return False
     else:
         try:
-            title_az = browser.find_element(By.ID, "productTitle").get_attribute("textContent").strip()
+            title_az = unidecode(browser.find_element(By.ID, "productTitle").get_attribute("textContent").split("(")[0].split("[")[0].replace("®", "").strip())
         except:
             return False
         try:
-            author_az = browser.find_element(By.CLASS_NAME, "author").find_element(By.CLASS_NAME,"a-link-normal").get_attribute("textContent").strip()
+            author_az = unidecode(browser.find_element(By.CLASS_NAME, "author").find_element(By.CLASS_NAME, "a-link-normal").get_attribute("textContent").strip())
             if "Visit Amazon's" in author_az:
                 author_az = author_az.split("Visit Amazon's ")[1].split(" Page")[0]
         except:
             author_az = "AUTHOR_MISSING_AZ"
         try:
-            reading_age = browser.find_element(By.ID, "rpi-attribute-book_details-customer_recommended_age").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").split(", from customers")[0].strip()
+            reading_age = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-customer_recommended_age").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").split(", from customers")[0].strip())
         except:
             reading_age = "READINGAGE_MISSING_AZ"
         try:
-            grade = browser.find_element(By.ID, "rpi-attribute-book_details-grade_level").find_element(By.CLASS_NAME,"rpi-attribute-value").get_attribute("textContent").strip()
+            grade = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-grade_level").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
         except:
             grade = "GRADE_MISSING_AZ"
 
@@ -125,10 +124,12 @@ def write_to_file():
 # Goodreads
 def merge_goodreads():
     isbn_list = create_isbn_list()
-    print("Processing " + str(len(isbn_list)) + " books...")
-    isbn_list = isbn_list[0:50]
+    print("Processing " + str(len(isbn_list)) + " books")
+    # print("Estimated time until finish: 100 minutes")
+    isbn_list = isbn_list[0:200]
+    start = time.time()
 
-    n = 10
+    n = 50
     chunks = [isbn_list[i * n:(i + 1) * n] for i in range((len(isbn_list) + n - 1) // n)]
 
     lock = threading.Lock()
@@ -143,3 +144,8 @@ def merge_goodreads():
             thread.join()
 
     write_to_file()
+
+    end = time.time()
+
+    print("Processing finished")
+    print("Elapsed time: " + str(time.strftime('%H:%M:%S', time.gmtime(end-start))))
