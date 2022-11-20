@@ -2,7 +2,8 @@ import csv
 import json
 import urllib.request
 import threading
-import time
+
+import numpy as np
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -30,10 +31,21 @@ def create_isbn_list():
 # Use openlibrary API to retrieve the title and author given an ISBN
 def openlibrary_info(isbn, lock):
     global count
+    with lock:
+        count = count + 1
+        if count % 100 == 0:
+            print(str(count) + " books done")
+
     try:
         with urllib.request.urlopen("https://openlibrary.org/isbn/" + isbn + ".json") as url_book:
             data_book = json.load(url_book)
             title_ol = unidecode(data_book["title"].split("(")[0].split("[")[0].split("\r\n")[0].strip())
+
+            with urllib.request.urlopen("https://covers.openlibrary.org/b/isbn/" + isbn + "-L.jpg") as input_image:
+                arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
+                if arr.nbytes < 1000:
+                    print(str(isbn) + " - Image too small")
+                    pass
 
             if "authors" in data_book:
                 with urllib.request.urlopen("https://openlibrary.org" + data_book["authors"][0]["key"] + ".json") as url_author:
@@ -43,15 +55,11 @@ def openlibrary_info(isbn, lock):
                 author_ol = "AUTHOR_MISSING_OL"
 
             az_info = amazon_info(isbn)
-
-            with lock:
-                count = count + 1
-                if count % 1000 == 0:
-                    print(str(count) + " books done...")
-
-                if not az_info:
-                    pass
-                else:
+            if isinstance(az_info, str):
+                print(str(isbn) + " - " + az_info)
+                pass
+            else:
+                with lock:
                     new_value = {
                         "isbn": isbn,
                         "title_ol": title_ol,
@@ -62,53 +70,56 @@ def openlibrary_info(isbn, lock):
                         "grade": az_info[3],
                     }
                     values.append(new_value)
-    except:
-        with lock:
-            count = count + 1
-            if count % 1000 == 0:
-                print(str(count) + " books done...")
+                    print(str(isbn))
+
+    except Exception as e:
+        print(str(isbn) + " - " + str(e))
+        pass
 
 
 def amazon_info(isbn):
     s = Service("chromedriver.exe")
     options = Options()
-    options.add_argument('--headless')
+    # options.add_argument("--headless")
     browser = webdriver.Chrome(service=s, options=options)
     url_search = "https://www.amazon.com/s?k="+isbn
     browser.get(url_search)
-    url_book = browser.find_element(By.CLASS_NAME, "s-search-results").find_element(By.CSS_SELECTOR, "[data-index=\"1\"]").find_element(By.CSS_SELECTOR, "[href]").get_property("href")
-    browser.get(url_book)
     try:
-        language = unidecode(browser.find_element(By.ID, "rpi-attribute-language").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
+        url_book = browser.find_element(By.CLASS_NAME, "s-search-results").find_element(By.CSS_SELECTOR, "[data-index=\"1\"]").find_element(By.CSS_SELECTOR, "[href]").get_property("href")
+        browser.get(url_book)
+        try:
+            language = unidecode(browser.find_element(By.ID, "rpi-attribute-language").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
+        except:
+            language = "English"
+
+        if language != "English":
+            return "Amazon not English"
+        else:
+            try:
+                title_az = unidecode(browser.find_element(By.ID, "productTitle").get_attribute("textContent").split("(")[0].split("[")[0].replace("®", "").strip())
+            except:
+                return "Amazon no title"
+            try:
+                author_az = unidecode(browser.find_element(By.CLASS_NAME, "author").find_element(By.CLASS_NAME, "a-link-normal").get_attribute("textContent").strip())
+                if "Visit Amazon's" in author_az:
+                    author_az = author_az.split("Visit Amazon's ")[1].split(" Page")[0]
+            except:
+                author_az = "AUTHOR_MISSING_AZ"
+            try:
+                reading_age = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-customer_recommended_age").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").split(", from customers")[0].strip())
+            except:
+                reading_age = "READINGAGE_MISSING_AZ"
+            try:
+                grade = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-grade_level").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
+            except:
+                grade = "GRADE_MISSING_AZ"
+
+            if reading_age == "READINGAGE_MISSING_AZ" and grade == "GRADE_MISSING_AZ":
+                return "Amazon no age"
+
+            return title_az, author_az, reading_age, grade
     except:
-        language = "English"
-
-    if language != "English":
-        return False
-    else:
-        try:
-            title_az = unidecode(browser.find_element(By.ID, "productTitle").get_attribute("textContent").split("(")[0].split("[")[0].replace("®", "").strip())
-        except:
-            return False
-        try:
-            author_az = unidecode(browser.find_element(By.CLASS_NAME, "author").find_element(By.CLASS_NAME, "a-link-normal").get_attribute("textContent").strip())
-            if "Visit Amazon's" in author_az:
-                author_az = author_az.split("Visit Amazon's ")[1].split(" Page")[0]
-        except:
-            author_az = "AUTHOR_MISSING_AZ"
-        try:
-            reading_age = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-customer_recommended_age").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").split(", from customers")[0].strip())
-        except:
-            reading_age = "READINGAGE_MISSING_AZ"
-        try:
-            grade = unidecode(browser.find_element(By.ID, "rpi-attribute-book_details-grade_level").find_element(By.CLASS_NAME, "rpi-attribute-value").get_attribute("textContent").strip())
-        except:
-            grade = "GRADE_MISSING_AZ"
-
-        if reading_age == "READINGAGE_MISSING_AZ" and grade == "GRADE_MISSING_AZ":
-            return False
-
-        return title_az, author_az, reading_age, grade
+        return "Amazon acting up"
 
 
 def write_to_file():
@@ -122,15 +133,16 @@ def write_to_file():
 
 
 # Goodreads
-def merge_goodreads():
-    isbn_list = create_isbn_list()
-    print("Processing " + str(len(isbn_list)) + " books")
-    # print("Estimated time until finish: 100 minutes")
-    isbn_list = isbn_list[0:200]
-    start = time.time()
+def merge_goodreads(threads, partition_size, partition):
+    print()
+    print("-------------------------------------------------------")
+    print("Processing partition " + str(partition))
+    print("-------------------------------------------------------")
+    global values
+    values = []
+    isbn_list = create_isbn_list()[(partition-1)*partition_size:partition*partition_size]
 
-    n = 50
-    chunks = [isbn_list[i * n:(i + 1) * n] for i in range((len(isbn_list) + n - 1) // n)]
+    chunks = [isbn_list[i * threads:(i + 1) * threads] for i in range((len(isbn_list) + threads - 1) // threads)]
 
     lock = threading.Lock()
 
@@ -144,8 +156,3 @@ def merge_goodreads():
             thread.join()
 
     write_to_file()
-
-    end = time.time()
-
-    print("Processing finished")
-    print("Elapsed time: " + str(time.strftime('%H:%M:%S', time.gmtime(end-start))))
