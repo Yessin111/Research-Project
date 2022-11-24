@@ -81,6 +81,8 @@ def amazon_info(isbn):
     s = Service("chromedriver.exe")
     options = Options()
     # options.add_argument("--headless")
+    options.add_argument("--disable-extensions")
+    # options.binary_location("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe")
     browser = webdriver.Chrome(service=s, options=options)
     url_search = "https://www.amazon.com/s?k="+isbn
     browser.get(url_search)

@@ -4,9 +4,10 @@ import numpy as np
 import skimage.measure
 from PIL import Image, ImageStat
 from sklearn.cluster import KMeans
-from color_names import color_names
+from research.color_names import color_names
 
 
+# https://stackoverflow.com/questions/9694165/convert-rgb-color-to-english-color-name-like-green-with-python
 def get_color_name(rgb_triplet):
     min_colours = {}
     for row in color_names:
@@ -56,13 +57,13 @@ def get_colorfulness(input_image):
 def get_contrast(input_image):
     contrast_image = cv2.cvtColor(input_image, cv2.COLOR_RGB2GRAY)
     contrast = contrast_image.std()
-    return round(contrast / 100, 3)
+    return round(contrast, 3)
 
 
 # https://stackoverflow.com/questions/50313114/what-is-the-entropy-of-an-image-and-how-is-it-calculated
 def get_entropy(input_image):
     entropy = skimage.measure.shannon_entropy(input_image)
-    return round(entropy / 100, 3)
+    return round(entropy, 3)
 
 
 def get_all():
