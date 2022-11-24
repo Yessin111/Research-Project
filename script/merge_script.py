@@ -15,10 +15,10 @@ count = 0
 
 
 # Add Goodreads ISBNs to list
-def create_isbn_list():
+def create_isbn_list(root):
     isbn_list = []
 
-    with open("data/goodreads.json", 'r') as file_json:
+    with open(root + "/data/goodreads_child.json", 'r') as file_json:
         for row in file_json:
             isbn = json.loads(row)["isbn"]
 
@@ -78,7 +78,7 @@ def openlibrary_info(isbn, lock):
 
 
 def amazon_info(isbn):
-    s = Service("chromedriver.exe")
+    s = Service("../chromedriver.exe")
     options = Options()
     # options.add_argument("--headless")
     options.add_argument("--disable-extensions")
@@ -124,8 +124,8 @@ def amazon_info(isbn):
         return "Amazon acting up"
 
 
-def write_to_file():
-    with open("data/combined_dataset.csv", 'a', newline='') as file_csv:
+def write_to_file(root):
+    with open(root + "/data/combined_dataset.csv", 'a', newline='') as file_csv:
         writer = csv.writer(file_csv, delimiter=";")
         for value in values:
             try:
@@ -135,15 +135,15 @@ def write_to_file():
 
 
 # Goodreads
-def merge_goodreads(threads, partition_size, partition):
+def merge_goodreads(threads, partition_size, partition, root):
     print()
     print("-------------------------------------------------------")
     print("Processing partition " + str(partition))
     print("-------------------------------------------------------")
     global values
     values = []
-    isbn_list = create_isbn_list()[(partition-1)*partition_size:partition*partition_size]
 
+    isbn_list = create_isbn_list(root)[(partition-1)*partition_size:partition*partition_size]
     chunks = [isbn_list[i * threads:(i + 1) * threads] for i in range((len(isbn_list) + threads - 1) // threads)]
 
     lock = threading.Lock()
@@ -157,4 +157,4 @@ def merge_goodreads(threads, partition_size, partition):
         for thread in threads:
             thread.join()
 
-    write_to_file()
+    write_to_file(root)

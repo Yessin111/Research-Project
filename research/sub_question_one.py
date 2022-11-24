@@ -1,4 +1,3 @@
-import os
 import threading
 import urllib.request
 import cv2
@@ -72,13 +71,13 @@ def get_entropy(input_image):
 
 
 def get_all(row, lock):
+    print(row["isbn"])
     try:
         with urllib.request.urlopen("https://covers.openlibrary.org/b/isbn/" + row["isbn"] + "-L.jpg") as input_image:
             arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
             image = cv2.imdecode(arr, -1)
 
             dom_color = get_dominant_color(image)
-            print(dom_color[0])
 
             row["dominant_color_rgb"] = dom_color[0]
             row["dominant_color_name"] = dom_color[1]
@@ -88,8 +87,8 @@ def get_all(row, lock):
             row["entropy"] = get_entropy(image)
 
             with lock:
-                print(arr.nbytes)
                 dictionary.append(row)
+
     except:
         pass
 
