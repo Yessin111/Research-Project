@@ -1,10 +1,15 @@
+import os
+import threading
 import urllib.request
 import cv2
-import numpy as np
+import json
 import skimage.measure
+import numpy as np
 from PIL import Image, ImageStat
 from sklearn.cluster import KMeans
 from research.color_names import color_names
+
+dictionary = []
 
 
 # https://stackoverflow.com/questions/9694165/convert-rgb-color-to-english-color-name-like-green-with-python
@@ -66,27 +71,67 @@ def get_entropy(input_image):
     return round(entropy, 3)
 
 
-def get_all():
-    isbn = "1841489611"
-    with urllib.request.urlopen("https://covers.openlibrary.org/b/isbn/" + isbn + "-L.jpg") as input_image:
-        arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
-        image = cv2.imdecode(arr, -1)
+def get_all(row, lock):
+    try:
+        with urllib.request.urlopen("https://covers.openlibrary.org/b/isbn/" + row["isbn"] + "-L.jpg") as input_image:
+            arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
+            image = cv2.imdecode(arr, -1)
 
-        dominant_color = get_dominant_color(image)
-        brightness = get_brightness(image)
-        colorfulness = get_colorfulness(image)
-        contrast = get_contrast(image)
-        entropy = get_entropy(image)
+            dom_color = get_dominant_color(image)
+            print(dom_color[0])
 
-        print(dominant_color)
-        print(brightness)
-        print(colorfulness)
-        print(contrast)
-        print(entropy)
+            row["dominant_color_rgb"] = dom_color[0]
+            row["dominant_color_name"] = dom_color[1]
+            row["brightness"] = get_brightness(image)
+            row["colorfulness"] = get_colorfulness(image)
+            row["contrast"] = get_contrast(image)
+            row["entropy"] = get_entropy(image)
 
-        cv2.imshow(isbn, image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+            with lock:
+                print(arr.nbytes)
+                dictionary.append(row)
+    except:
+        pass
 
 
-get_all()
+def write_to_file(partition, root):
+    if partition == 1:
+        open(root + "/data/data_subquestion_one.json", "w")
+
+        with open(root + "/data/data_subquestion_one.json", "r+") as file_json:
+            file_json.seek(0)
+            json.dump(dictionary, file_json, indent=4)
+    else:
+        with open(root + "/data/data_subquestion_one.json", "r+") as file_json:
+            file_data = json.loads(file_json.read())
+            file_data = file_data + dictionary
+            file_json.seek(0)
+            json.dump(file_data, file_json, indent=4)
+
+
+def sub_question_one(threads, partition_size, partition, root):
+    print()
+    print("-------------------------------------------------------")
+    print("Processing partition " + str(partition))
+    print("-------------------------------------------------------")
+    global dictionary
+    dictionary = []
+
+    with open(root + "/data/data.json", "r") as file_json:
+        json_data = json.load(file_json)
+
+    json_data = json_data[(partition - 1) * partition_size:partition * partition_size]
+    chunks = [json_data[i * threads:(i + 1) * threads] for i in range((len(json_data) + threads - 1) // threads)]
+
+    lock = threading.Lock()
+
+    for chunk in chunks:
+        threads = []
+        for row in chunk:
+            thread = threading.Thread(target=get_all, args=(row, lock,))
+            thread.start()
+            threads.append(thread)
+        for thread in threads:
+            thread.join()
+
+    write_to_file(partition, root)
