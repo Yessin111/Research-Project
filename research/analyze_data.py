@@ -4,7 +4,7 @@ from difflib import SequenceMatcher
 
 
 def check_new_classification():
-    with open("../data/combined_dataset.csv", newline='') as file_csv:
+    with open("../data/combined_dataset_child.csv", newline='') as file_csv:
         reader = csv.reader(file_csv, delimiter=';')
         next(reader)
 
@@ -67,7 +67,7 @@ def check_new_classification():
 
 
 def analyze_age():
-    with open("../data/combined_dataset.csv", newline='') as file_csv:
+    with open("../data/combined_dataset_child.csv", newline='') as file_csv:
         reader = csv.reader(file_csv, delimiter=';')
         next(reader)
         count = 0
@@ -119,7 +119,7 @@ def analyze_age():
 
 
 def analyze_title():
-    with open("../data/combined_dataset.csv", newline='') as file_csv:
+    with open("../data/combined_dataset_child.csv", newline='') as file_csv:
         reader = csv.reader(file_csv, delimiter=';')
         next(reader)
 

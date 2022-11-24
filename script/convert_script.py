@@ -16,11 +16,8 @@ def analyze_age(reading_age, grade):
         else:
             age = age.split(" years")[0]
             nums = [int(i) for i in age.split() if i.isdigit()]
-            if nums[0] >= nums[1] - 4:
-                num1 = nums[0]
-                num2 = nums[1]
-            else:
-                return False
+            num1 = nums[0]
+            num2 = nums[1]
     else:
         replacements = {"Baby": "1", "Preschool": "5", "Kindergarten": "6", "10": "16", "11": "17", "12": "18",
                         "1": "7", "2": "8", "3": "9", "4": "10", "5": "11", "6": "12", "7": "13",
@@ -35,22 +32,28 @@ def analyze_age(reading_age, grade):
             num2 = num1 + 2
         else:
             nums = [int(i) for i in age.split() if i.isdigit()]
-            if nums[0] >= nums[1] - 4:
-                num1 = nums[0]
-                num2 = nums[1]
-            else:
-                return False
+            num1 = nums[0]
+            num2 = nums[1]
 
     if num1 <= 3 or num2 <= 3:
         result.append(0)
-    if 4 <= num1 <= 6 or 4 <= num2 <= 6:
+    if 4 <= num1 <= 6 or 4 <= num2 <= 6 or num1 <= 4 and 6 <= num2:
         result.append(1)
-    if 7 <= num1 <= 9 or 7 <= num2 <= 9:
+    if 7 <= num1 <= 9 or 7 <= num2 <= 9 or num1 <= 7 and 9 <= num2:
         result.append(2)
-    if 10 <= num1 <= 12 or 10 <= num2 <= 12:
+    if 10 <= num1 <= 12 or 10 <= num2 <= 12 or num1 <= 10 and 12 <= num2:
         result.append(3)
     if num1 >= 13 or num2 >= 13:
         result.append(4)
+
+    if num1 < num2 - 4:
+        print(str(num1) + " " + str(num2))
+        print(len(result))
+        print(result)
+        print()
+
+    if len(result) >= 3:
+        return False
 
     return result
 
@@ -61,14 +64,13 @@ def convert_data(root):
     if not os.path.isfile(root + "/data/data.json"):
         dictionary = []
 
-        with open(root + "/data/combined_dataset.csv", newline='') as file_csv:
+        with open(root + "/data/combined_dataset_child.csv", newline='') as file_csv:
             reader = csv.reader(file_csv, delimiter=';')
             next(reader)
 
             for row in reader:
                 total = total + 1
                 age = analyze_age(row[5], row[6])
-
                 if not age:
                     pass
                 else:

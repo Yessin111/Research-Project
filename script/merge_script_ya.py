@@ -18,7 +18,7 @@ count = 0
 def create_isbn_list(root):
     isbn_list = []
 
-    with open(root + "/data/goodreads_child.json", 'r') as file_json:
+    with open(root + "/data/goodreads_ya.json", 'r') as file_json:
         for row in file_json:
             isbn = json.loads(row)["isbn"]
 
@@ -125,7 +125,7 @@ def amazon_info(isbn):
 
 
 def write_to_file(root):
-    with open(root + "/data/combined_dataset.csv", 'a', newline='') as file_csv:
+    with open(root + "/data/combined_dataset_ya.csv", 'a', newline='') as file_csv:
         writer = csv.writer(file_csv, delimiter=";")
         for value in values:
             try:

@@ -11,8 +11,12 @@ goodreads_ya_url = "https://drive.google.com/uc?id=1gH7dG4yQzZykTpbHYsrw2nFknjUm
 def initialize(root):
     if not os.path.exists(root + "/data"):
         os.makedirs(root + "/data")
-    if not os.path.isfile(root + "/data/combined_dataset.csv"):
-        with open(root + "/data/combined_dataset.csv", 'w', newline='') as f:
+    if not os.path.isfile(root + "/data/combined_dataset_child.csv"):
+        with open(root + "/data/combined_dataset_child.csv", 'w', newline='') as f:
+            wr = csv.writer(f, delimiter=";")
+            wr.writerow(["isbn", "title_ol", "title_az", "author_ol", "author_az", "reading_age", "grade"])
+    if not os.path.isfile(root + "/data/combined_dataset_ya.csv"):
+        with open(root + "/data/combined_dataset_ya.csv", 'w', newline='') as f:
             wr = csv.writer(f, delimiter=";")
             wr.writerow(["isbn", "title_ol", "title_az", "author_ol", "author_az", "reading_age", "grade"])
 
