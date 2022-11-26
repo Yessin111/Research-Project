@@ -265,5 +265,6 @@ external-deps/python-lsp-server/.installation-dir/
 
 # Built Visual Studio Code Extensions
 *.vsix
-/data/*
+/data/goodreads_child.json
+/data/goodreads_ya.json
 /saves/*

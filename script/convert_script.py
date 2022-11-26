@@ -1,7 +1,11 @@
+import collections
 import csv
 import json
 import os
 import re
+
+dictionary = []
+isbn = []
 
 
 def analyze_age(reading_age, grade):
@@ -46,35 +50,25 @@ def analyze_age(reading_age, grade):
     if num1 >= 13 or num2 >= 13:
         result.append(4)
 
-    if num1 < num2 - 4:
-        print(str(num1) + " " + str(num2))
-        print(len(result))
-        print(result)
-        print()
-
     if len(result) >= 3:
-        return False
+        result = result[0:2]
 
     return result
 
 
-def convert_data(root):
-    total = 0
-    good = 0
-    if not os.path.isfile(root + "/data/data.json"):
-        dictionary = []
+def add_data(path):
+    with open(path, newline='') as file_csv:
+        reader = csv.reader(file_csv, delimiter=';')
+        next(reader)
 
-        with open(root + "/data/combined_dataset_child.csv", newline='') as file_csv:
-            reader = csv.reader(file_csv, delimiter=';')
-            next(reader)
+        for row in reader:
+            age = analyze_age(row[5], row[6])
+            if not age:
+                pass
+            else:
+                if not row[0] in isbn:
+                    isbn.append(row[0])
 
-            for row in reader:
-                total = total + 1
-                age = analyze_age(row[5], row[6])
-                if not age:
-                    pass
-                else:
-                    good = good + 1
                     entry = {
                         "isbn": row[0],
                         "age": age,
@@ -82,9 +76,12 @@ def convert_data(root):
 
                     dictionary.append(entry)
 
+
+def convert_data(root):
+    if not os.path.isfile(root + "/data/data.json"):
+        add_data(root + "/data/combined_dataset_ya.csv")
+        add_data(root + "/data/combined_dataset_child.csv")
+
         with open(root + "/data/data.json", "w") as file_json:
             json_object = json.dumps(dictionary, indent=4)
             file_json.write(json_object)
-
-    print(total)
-    print(good)
