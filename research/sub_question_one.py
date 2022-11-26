@@ -92,6 +92,24 @@ def get_all(row, lock):
     except:
         pass
 
+def get_all_tester():
+    try:
+        with urllib.request.urlopen("https://m.media-amazon.com/images/I/61x3dNJSFnL.jpg") as input_image:
+            arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
+            image = cv2.imdecode(arr, -1)
+
+            dom_color = get_dominant_color(image)
+
+            print(dom_color[0])
+            print(dom_color[1])
+            print(get_brightness(image))
+            print(get_colorfulness(image))
+            print(get_contrast(image))
+            print(get_entropy(image))
+
+    except Exception as e:
+        print(e)
+
 
 def write_to_file(partition, root):
     if partition == 1 or partition == 600 or partition == 1200:
