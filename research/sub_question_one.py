@@ -94,7 +94,7 @@ def get_all(row, lock):
 
 
 def write_to_file(partition, root):
-    if partition == 1:
+    if partition == 1 or partition == 600 or partition == 1200:
         open(root + "/data/data_subquestion_one.json", "w")
 
         with open(root + "/data/data_subquestion_one.json", "r+") as file_json:
