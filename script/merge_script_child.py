@@ -37,8 +37,10 @@ def openlibrary_info(isbn, lock):
     try:
         az_info = amazon_info(isbn)
         if isinstance(az_info, str):
-            print(str(isbn) + " - " + az_info)
-            pass
+            az_info = amazon_info(isbn)
+            if isinstance(az_info, str):
+                print(str(isbn) + " - " + az_info)
+                pass
         else:
             with lock:
                 new_value = {
@@ -96,7 +98,7 @@ def amazon_info(isbn):
             except:
                 grade = "GRADE_MISSING_AZ"
             try:
-                cover_url = unidecode(browser.find_element(By.ID, "booksImageBlock_feature_div").get_attribute("innerHTML").split("mainUrl\":\"")[1].split("\",\"dimensions")[0])
+                cover_url = unidecode(browser.find_element(By.ID, "leftCol").get_attribute("innerHTML").split("mainUrl\":\"")[1].split("\",\"dimensions")[0])
             except:
                 return "Amazon no cover"
 

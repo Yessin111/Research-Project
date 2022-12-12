@@ -70,49 +70,44 @@ def get_entropy(input_image):
     return round(entropy, 3)
 
 
+def get_entry(input_image):
+    arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
+    image = cv2.imdecode(arr, -1)
+
+    dom_color = get_dominant_color(image)
+
+    entry = {
+        "dominant_color_rgb": dom_color[0],
+        "dominant_color_name": dom_color[1],
+        "brightness": get_brightness(image),
+        "colorfulness": get_colorfulness(image),
+        "contrast": get_contrast(image),
+        "entropy": get_entropy(image)
+    }
+
+    return entry
+
+
 def get_all(row, lock):
     print(row["isbn"])
     try:
-        with urllib.request.urlopen("https://covers.openlibrary.org/b/isbn/" + row["isbn"] + "-L.jpg") as input_image:
-            arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
-            image = cv2.imdecode(arr, -1)
-
-            dom_color = get_dominant_color(image)
-
-            row["dominant_color_rgb"] = dom_color[0]
-            row["dominant_color_name"] = dom_color[1]
-            row["brightness"] = get_brightness(image)
-            row["colorfulness"] = get_colorfulness(image)
-            row["contrast"] = get_contrast(image)
-            row["entropy"] = get_entropy(image)
-
-            with lock:
-                dictionary.append(row)
-
+        with urllib.request.urlopen(row["library"]["cover"]) as input_image:
+            row["library"]["sq1"] = get_entry(input_image)
     except:
         pass
 
-def get_all_tester():
     try:
-        with urllib.request.urlopen("https://m.media-amazon.com/images/I/61x3dNJSFnL.jpg") as input_image:
-            arr = np.asarray(bytearray(input_image.read()), dtype=np.uint8)
-            image = cv2.imdecode(arr, -1)
+        with urllib.request.urlopen(row["amazon"]["cover"]) as input_image:
+            row["amazon"]["sq1"] = get_entry(input_image)
+    except:
+        pass
 
-            dom_color = get_dominant_color(image)
-
-            print(dom_color[0])
-            print(dom_color[1])
-            print(get_brightness(image))
-            print(get_colorfulness(image))
-            print(get_contrast(image))
-            print(get_entropy(image))
-
-    except Exception as e:
-        print(e)
+    with lock:
+        dictionary.append(row)
 
 
 def write_to_file(partition, root):
-    if partition == 1 or partition == 600 or partition == 1200:
+    if partition == 1:
         open(root + "/data/data_subquestion_one.json", "w")
 
         with open(root + "/data/data_subquestion_one.json", "r+") as file_json:

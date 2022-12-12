@@ -62,7 +62,7 @@ def add_data(path):
         next(reader)
 
         for row in reader:
-            age = analyze_age(row[5], row[6])
+            age = analyze_age(row[3], row[4])
             if not age:
                 pass
             else:
@@ -72,6 +72,12 @@ def add_data(path):
                     entry = {
                         "isbn": row[0],
                         "age": age,
+                        "library": {
+                            "cover": "https://covers.openlibrary.org/b/isbn/" + row[0] + "-L.jpg"
+                        },
+                        "amazon": {
+                            "cover": row[5]
+                        }
                     }
 
                     dictionary.append(entry)
