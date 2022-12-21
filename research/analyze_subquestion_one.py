@@ -1,49 +1,33 @@
 import json
 
 
+def mapper(data, count):
+    return round(round(data, 3)/count, 3)
+
+
 def analyze(root):
 
-    amount = [0, 0, 0, 0, 0]
-    brightness_list = [0, 0, 0, 0, 0]
-    colorfulness_list = [0, 0, 0, 0, 0]
-    init = False
-    brightness_lowest = -1
-    brightness_highest = -1
-    colorfulness_lowest = -1
-    colorfulness_highest = -1
+    amazon_count = [0, 0, 0, 0, 0]
+    amazon_brightness = [0, 0, 0, 0, 0]
+    amazon_colorfulness = [0, 0, 0, 0, 0]
+    amazon_contrast = [0, 0, 0, 0, 0]
+    amazon_entropy = [0, 0, 0, 0, 0]
 
     with open(root + "/data/data_subquestion_one.json", 'r') as file_json:
         json_data = json.load(file_json)
+
         for row in json_data:
-            age = row["age"]
-            brightness = row["brightness"]
-            colorfulness = row["colorfulness"]
+            if "sq1" in row["amazon"]:
+                for i in range(5):
+                    if i in row["age"]:
+                        amazon_count[i] = amazon_count[i] + 1
+                        amazon_brightness[i] = amazon_brightness[i] + row["amazon"]["sq1"]["brightness"]
+                        amazon_colorfulness[i] = amazon_colorfulness[i] + row["amazon"]["sq1"]["colorfulness"]
+                        amazon_contrast[i] = amazon_contrast[i] + row["amazon"]["sq1"]["contrast"]
+                        amazon_entropy[i] = amazon_entropy[i] + row["amazon"]["sq1"]["entropy"]
 
-            if not init:
-                brightness_lowest = brightness
-                brightness_highest = brightness
-                colorfulness_lowest = colorfulness
-                colorfulness_highest = colorfulness
-                init = True
-            else:
-                if brightness < brightness_lowest:
-                    brightness_lowest = brightness
-                if brightness > brightness_highest:
-                    brightness_highest = brightness
-                if colorfulness < colorfulness_lowest:
-                    colorfulness_lowest = colorfulness
-                if colorfulness > colorfulness_highest:
-                    colorfulness_highest = colorfulness
+    print(list(map(mapper, amazon_brightness, amazon_count)))
+    print(list(map(mapper, amazon_colorfulness, amazon_count)))
+    print(list(map(mapper, amazon_contrast, amazon_count)))
+    print(list(map(mapper, amazon_entropy, amazon_count)))
 
-            for i in range(5):
-                if i in age:
-                    amount[i] = amount[i] + 1
-                    brightness_list[i] = brightness_list[i] + brightness
-                    colorfulness_list[i] = colorfulness_list[i] + colorfulness
-
-    for i in range(5):
-        brightness_list[i] = round(brightness_list[i] / amount[i], 3)
-
-    print(colorfulness)
-    print(colorfulness_lowest)
-    print(colorfulness_highest)

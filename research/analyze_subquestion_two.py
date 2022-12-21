@@ -2,7 +2,6 @@ import urllib.request
 import cv2
 import numpy as np
 from pytesseract import pytesseract
-from imageai.Detection import ObjectDetection
 import PIL
 
 obj_detect = ObjectDetection()

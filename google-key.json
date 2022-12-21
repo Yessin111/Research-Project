@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "research-project-tudelft",
+  "private_key_id": "fd99de5fa8c2874fe3986484334559d362bd3157",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCSVu9W/2Wygood\n+GMo9JMxrvi4iMGz8MrA5xUkDC7rEJRPEBRPliqNZP7pZC7mVck2nmbvbuBSqaHY\nJYxTsJGXbn3Qmfz2YFCWynKMSnfxO+dVAffiWDy3ABvOwsLHgO1mX82AwQEaFZf1\n0VCwedwIdjOks837yUrMvDylJGC6ENYnLdnw7vn1EbAtMYqfTQL8fXrVJo39wDV+\nI1PZXH6piK44LqIRv9MSjhmKdrlR2JCEMkatoaw9oGgkXZmBrJvIsgMEPthzeRZF\n1sZKlTj0dj+BphaPzUSn1h7G48q8KrlNUWlq/LzOJdZAq5W5ZKFFl4QG5sdTodUe\n7ThnQwnDAgMBAAECggEAGCIuJnLIGsBcdsTX1ZFAFRl9+zDSgRJc3aM+YUuBEVMS\noldMgjOJoPfe8i6LbYEIRfGpmCL466j9/99xXPvphse6CATdKuSHZdbNPUWqsiXm\n6KYCc1mJ6cQi0d5csPoaLJ/wDCPIQrz86pUycWgnWV3k9myQs81mgI0qkzGEoiqU\nzXprulBjzILjOyrE83jsoJqoLP3R2HcuRq9o9eLUky6En7hpjup+YyxDABULMMIN\nyGosvE0pkFwB0yGCWF9POXoD2957Y/ARp6izcws0Vd9uMLy9T281YjD3dRflBTJ6\nW1HfEFyy2h70roKE6hvbgKgOYMQcl33lSKTx/kB8QQKBgQDEo96qujrN66MT5BCa\nm0fX+BFQs73xES3QDZOkIUZTqo9JWvmhnScCrDsD/avuUGjf+WMMw55xoLRqt+5Q\nN8GSsJIE8oyuMHaUiloznpsnisn3yXXkxyZZrW+eNyNEbVksSwlZERGZPdpUEom3\nJD8/7WCXOYklgyKTNgB5TL/L9wKBgQC+g+VrvPRDm16zEgjen9SoC0LWYnNxANKp\ntNUMQP9e9pA7aFzDpTMfSFKPGWRkKj3jdNRo8YwXPLgEpQNWUaXhqW8SlYZpHWiy\n0QhXpuR7H03ReWXdvb59a5CHnluqkbhb+70cnXogj04AD6S5tknRmtSaWtryc5ak\nGZIbsCaFlQKBgAYSqYXMSpShel/a40hjE0zwNFixtGQFi8ypHq4q+OkMk3BIhv0e\nxV2nxArTgsPRZ+vC3/Q89l+7/tZs58dCcY/+NARDGWUnygG8ZBzEATavap1kc2el\nXuHWIWRZf5VVazOa/abqiAibiGqgR/CIBgwLYLhK5plp+19gg5M7c5DxAoGBAJ7f\nZuZdgGUQn/w8weDE8JXiLi6RkytdQE/9WN0LJuqOOuEPuqv8i5E+wnpK9okBIPMZ\nbjjFlcma/OoCobHODMMOhG2++4OU3safwpE1v7tc84wH7IbpwHzewnwV9uNa+Z7b\nY20Fdd7JIoayhO/Jr+13bGv78DHXanwWRt2IG9exAoGAfFYXG7LXysTCwdEd84SK\nz/RVFDvgmXBPfjEH98kh8Jxtcs9sp5uOA9x9HFo7vt9DJoCHb1q854DcvMzj7rnK\nA4AjTRujWoJyOSUd0eMLbbuc5Dm25NU13a7Wu7ky3hzQ0GrB0TIIrBIUhcMmiU/I\nYAkQYJ2Ml0UC8fw1rRWLFmI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "research-project@research-project-tudelft.iam.gserviceaccount.com",
+  "client_id": "114229495238016661723",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/research-project%40research-project-tudelft.iam.gserviceaccount.com"
+}
