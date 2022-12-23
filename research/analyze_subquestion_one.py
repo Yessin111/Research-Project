@@ -1,17 +1,33 @@
 import json
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def mapper(data, count):
     return round(round(data, 3)/count, 3)
 
 
-def analyze(root):
+def plot(data):
+    # plt.boxplot(data)
+    #
+    # plt.xlabel('x values')
+    # plt.ylabel('y values')
+    # plt.title('plotted x and y values')
+    # plt.legend(['line 1'])
+    # # plt.savefig('plot.png', dpi=300, bbox_inches='tight')
+    # plt.show()
 
+    fig, ax = plt.subplots()
+    ax.boxplot(my_dict.values())
+    ax.set_xticklabels(my_dict.keys())
+
+
+def analyze(root):
     amazon_count = [0, 0, 0, 0, 0]
-    amazon_brightness = [0, 0, 0, 0, 0]
-    amazon_colorfulness = [0, 0, 0, 0, 0]
-    amazon_contrast = [0, 0, 0, 0, 0]
-    amazon_entropy = [0, 0, 0, 0, 0]
+    amazon_brightness = [[], [], [], [], []]
+    amazon_colorfulness = [[], [], [], [], []]
+    amazon_contrast = [[], [], [], [], []]
+    amazon_entropy = [[], [], [], [], []]
 
     with open(root + "/data/data_subquestion_one.json", 'r') as file_json:
         json_data = json.load(file_json)
@@ -21,13 +37,9 @@ def analyze(root):
                 for i in range(5):
                     if i in row["age"]:
                         amazon_count[i] = amazon_count[i] + 1
-                        amazon_brightness[i] = amazon_brightness[i] + row["amazon"]["sq1"]["brightness"]
-                        amazon_colorfulness[i] = amazon_colorfulness[i] + row["amazon"]["sq1"]["colorfulness"]
-                        amazon_contrast[i] = amazon_contrast[i] + row["amazon"]["sq1"]["contrast"]
-                        amazon_entropy[i] = amazon_entropy[i] + row["amazon"]["sq1"]["entropy"]
+                        amazon_brightness[i].append(row["amazon"]["sq1"]["brightness"])
+                        amazon_colorfulness[i].append(row["amazon"]["sq1"]["colorfulness"])
+                        amazon_contrast[i].append(row["amazon"]["sq1"]["contrast"])
+                        amazon_entropy[i].append(row["amazon"]["sq1"]["entropy"])
 
-    print(list(map(mapper, amazon_brightness, amazon_count)))
-    print(list(map(mapper, amazon_colorfulness, amazon_count)))
-    print(list(map(mapper, amazon_contrast, amazon_count)))
-    print(list(map(mapper, amazon_entropy, amazon_count)))
-
+    plot(amazon_brightness[0])
