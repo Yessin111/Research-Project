@@ -10,6 +10,7 @@ from script import merge_script_child as msc
 from script import merge_script_ya as msy
 from research import sub_question_one as sq1
 from research import analyze_subquestion_one as asq1
+from research import analyze_subquestion_three as asq3
 
 root = os.getcwd()
 partition_size = 25
@@ -32,4 +33,5 @@ max_partition_sq1 = math.ceil(93662/partition_size) + 1
 # for partition in range(1, max_partition_sq1):
 #     sq1.sub_question_one(threads_sq1, partition_size, partition, root)
 
-asq1.analyze(root)
+# asq1.analyze(root)
+asq3.analyze(root)

@@ -1,7 +1,7 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-from research.color_names import color_names, color_names_dict
+from research.color_names import color_names, color_names_dict, color_names_graph
 
 
 def mapper(data, count):
@@ -38,29 +38,23 @@ def make_box(data1, data2, name):
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05),
               fancybox=True, shadow=True, ncol=5)
-    plt.savefig(name)
+    plt.savefig("plots/" + name)
 
 
 def make_pie(data, name):
-    labels = []
-    sizes = []
-    colors = []
-    key_list = list(color_names_dict.keys())
-    val_list = list(color_names_dict.values())
+    plt.figure()
+    labels = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo', 'Violet', 'Black', 'White']
+    sizes = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+    colors = ["#FF0000", "#FF9900", "#FFFF00", "#339933", "#0000FF", "#4B0082", "#EE82EE", "#000000", "#FFFFFF"]
 
     for (x, y) in data:
-        labels.append(x)
-        sizes.append(y)
-        colors.append('#%02x%02x%02x' % key_list[val_list.index(x)])
+        for i in range(9):
+            if x in color_names_graph[i]:
+                sizes[i] = sizes[i] + y
+                pass
 
-    bars = plt.bar(labels, sizes)
-
-    i = 0
-    for c in colors:
-        bars[i].set_color(colors[i])
-        i = i + 1
-
-    plt.show()
+    plt.pie(sizes, colors=colors, wedgeprops={"edgecolor" : "black", 'linewidth': 1, 'antialiased': True}, autopct='%1.1f%%', pctdistance=1.2)
+    plt.savefig("plots/" + name)
 
 
 def analyze(root):
@@ -100,13 +94,13 @@ def analyze(root):
                         library_contrast[i].append(row["library"]["sq1"]["contrast"])
                         library_entropy[i].append(row["library"]["sq1"]["entropy"])
 
+    # for i in range(5):
+    #     amazon_colors[i] = sorted(amazon_colors[i].items(), key=lambda x: x[1], reverse=True)
+    #     library_colors[i] = sorted(library_colors[i].items(), key=lambda x: x[1], reverse=True)
+    #     make_pie(amazon_colors[i], "amazon_color_" + str(i))
+    #     make_pie(library_colors[i], "library_color_" + str(i))
+    #
     # make_box(amazon_brightness, library_brightness, "brightness")
     # make_box(amazon_colorfulness, library_colorfulness, "colorfulness")
     # make_box(amazon_contrast, library_contrast, "contrast")
     # make_box(amazon_entropy, library_entropy, "entropy")
-
-    for i in range(5):
-        amazon_colors[i] = sorted(amazon_colors[i].items(), key=lambda x: x[1], reverse=True)
-        library_colors[i] = sorted(library_colors[i].items(), key=lambda x: x[1], reverse=True)
-
-    make_pie(amazon_colors[0], "amazon_color_0")

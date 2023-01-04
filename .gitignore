@@ -269,3 +269,4 @@ external-deps/python-lsp-server/.installation-dir/
 /data/goodreads_ya.json
 /saves/*
 /data/data_subquestion_one.json
+/plots/
